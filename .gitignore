@@ -1,0 +1,19 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Firebase / credenciales — NUNCA subir esto
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+lib/firebase_options.dart
+scripts/serviceAccountKey.json
+
+# IDE
+.idea/
+*.iml
+.vscode/
+# Widget Preview related
+.widget_preview/

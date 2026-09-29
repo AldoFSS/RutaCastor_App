@@ -1,0 +1,36 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function estaAutenticado() {
+      return request.auth != null;
+    }
+
+    function esDueno(uid) {
+      return estaAutenticado() && request.auth.uid == uid;
+    }
+
+    function esAdmin() {
+      return estaAutenticado() &&
+        get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.rol == 'admin';
+    }
+
+    match /usuarios/{uid} {
+      allow read: if esDueno(uid) || esAdmin();
+      allow create: if esDueno(uid);
+      allow update: if esDueno(uid) || esAdmin();
+      allow delete: if esAdmin();
+    }
+
+    match /roles/{id} {
+      allow read: if estaAutenticado();
+      allow write: if esAdmin();
+    }
+
+    match /permisos/{id} {
+      allow read: if estaAutenticado();
+      allow write: if esAdmin();
+    }
+  }
+}
