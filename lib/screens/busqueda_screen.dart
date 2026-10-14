@@ -3,7 +3,7 @@ import '../models/categoria.dart';
 import '../services/categoria_service.dart';
 
 class BusquedaScreen extends StatefulWidget {
-  const BusquedaScreen({Key? key}) : super(key: key);
+  const BusquedaScreen({super.key});
 
   @override
   _BusquedaScreenState createState() => _BusquedaScreenState();
@@ -134,7 +134,7 @@ class _BusquedaScreenState extends State<BusquedaScreen> {
                             },
                           ),
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
           ),

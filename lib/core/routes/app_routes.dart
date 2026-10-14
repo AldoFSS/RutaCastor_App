@@ -11,4 +11,5 @@ class AppRoutes {
   static const cambiarPassword = '/cambiar-password';
   static const usuarios = '/usuarios';
   static const usuarioDetalle = '/usuarios/detalle';
+  static const espacios = '/espacios';
 }

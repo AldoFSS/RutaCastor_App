@@ -43,17 +43,17 @@ Este scaffold cubre lo planeado para el Sprint 1 hasta el 19-sep:
    ```bash
    flutter pub get
    ```
-2. Configura Firebase para Android (agrega tu `android/app/google-services.json`
-   real, el de este scaffold es solo un placeholder).
-3. Genera `lib/firebase_options.dart` con:
+2. Para probar las pantallas sin configurar Firebase, ejecuta el modo demo:
    ```bash
-   flutterfire configure
+   flutter run -d edge --dart-define=RUTACASTOR_DEMO=true
    ```
-   y descomenta la línea `options: DefaultFirebaseOptions.currentPlatform`
-   en `lib/main.dart`.
-4. Corre la app:
+   También puedes usar otro dispositivo Flutter en lugar de `edge`. El modo
+   demo permite entrar como invitado y usa datos de ejemplo en memoria; login,
+   registro y cambios de contraseña requieren Firebase.
+3. Para usar Firebase, configura el proyecto siguiendo el checklist de abajo
+   y ejecuta la app sin `RUTACASTOR_DEMO`:
    ```bash
-   flutter run
+   flutter run -d android
    ```
 
 ## Configuración de Firebase (checklist)
@@ -83,3 +83,19 @@ usuarios/{uid}
 
 Colecciones `roles/{id}` y `permisos/{id}` siguen la misma lógica de
 `fromMap`/`toMap` definida en `lib/models/rol.dart` y `lib/models/permiso.dart`.
+
+## Módulo de espacios
+
+La pantalla **Espacios** consulta `espacios` en tiempo real, con filtros por
+edificio y categoría y búsqueda local por nombre. Cada documento contiene
+`nombre`, `descripcion`, `edificioId` y `categoriaId`, además de `imagenUrl`
+opcional. Los IDs referencian documentos de `edificios` y `categorias`.
+
+El servicio Firestore está en
+`lib/features/espacios/data/services/espacio_service.dart`. Las reglas permiten
+lectura a usuarios autenticados y reservan las escrituras de espacios para
+administradores. La app incluye lista y detalle; las operaciones CRUD se
+exponen mediante el servicio. El modo demo usa datos en memoria y no requiere Firebase.
+Para el modo Firebase, crea primero los documentos referenciados en
+`edificios` y `categorias`, revisa y publica las reglas de `firestore.rules`,
+y luego usa una sesión administradora para escribir espacios.

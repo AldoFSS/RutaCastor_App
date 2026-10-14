@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 
 import '../services/secure_storage_service.dart';
+import '../mock/demo_repositories.dart';
+import '../../features/espacios/data/services/espacio_service.dart';
 
 import '../../features/user/domain/entities/usuario.dart';
 
@@ -31,28 +33,40 @@ import '../../features/user/presentation/cubit/perfil_cubit.dart';
 /// Contenedor de inyección de dependencias (patrón Service Locator con
 /// get_it).
 ///
-/// Registra como **singleton** los servicios, fuentes de datos y
-/// repositorios que deben existir una sola vez en toda la app (conexión
-/// a Firebase, almacenamiento local seguro, repositorios, el AuthCubit
-/// que guarda el estado global de sesión); y como **factory** los Cubits
-/// de pantalla, que se crean nuevos cada vez que la pantalla los pide.
+/// Registra repositorios Firebase en modo normal y repositorios en memoria
+/// en modo demo. Los Cubits de pantalla se crean como factories.
 final sl = GetIt.instance;
 
-Future<void> initInjectionContainer() async {
-  // ---- Externos / infraestructura ----
-  sl.registerLazySingleton(() => FirebaseAuth.instance);
-  sl.registerLazySingleton(() => FirebaseFirestore.instance);
-  sl.registerLazySingleton<SecureStorageService>(
-    () => SecureStorageService.instance,
+Future<void> initInjectionContainer({bool demoMode = false}) async {
+  sl.registerLazySingleton<EspacioService>(
+    () => demoMode ? EspacioService.demo() : EspacioService(),
   );
 
-  // ---- Feature: Auth ----
-  sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(auth: sl(), firestore: sl()),
-  );
-  sl.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(remoteDataSource: sl(), storageService: sl()),
-  );
+  if (demoMode) {
+    sl.registerLazySingleton<AuthRepository>(DemoAuthRepository.new);
+    sl.registerLazySingleton<UsuarioRepository>(DemoUsuarioRepository.new);
+  } else {
+    // ---- Firebase / infraestructura ----
+    sl.registerLazySingleton(() => FirebaseAuth.instance);
+    sl.registerLazySingleton(() => FirebaseFirestore.instance);
+    sl.registerLazySingleton<SecureStorageService>(
+      () => SecureStorageService.instance,
+    );
+    // ---- Repositorios Firebase ----
+    sl.registerLazySingleton<AuthRemoteDataSource>(
+      () => AuthRemoteDataSourceImpl(auth: sl(), firestore: sl()),
+    );
+    sl.registerLazySingleton<AuthRepository>(
+      () => AuthRepositoryImpl(remoteDataSource: sl(), storageService: sl()),
+    );
+    sl.registerLazySingleton<UsuarioRemoteDataSource>(
+      () => UsuarioRemoteDataSourceImpl(firestore: sl()),
+    );
+    sl.registerLazySingleton<UsuarioRepository>(
+      () => UsuarioRepositoryImpl(remoteDataSource: sl()),
+    );
+  }
+
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => RegistrarUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
@@ -71,12 +85,6 @@ Future<void> initInjectionContainer() async {
   );
 
   // ---- Feature: Usuario ----
-  sl.registerLazySingleton<UsuarioRemoteDataSource>(
-    () => UsuarioRemoteDataSourceImpl(firestore: sl()),
-  );
-  sl.registerLazySingleton<UsuarioRepository>(
-    () => UsuarioRepositoryImpl(remoteDataSource: sl()),
-  );
   sl.registerLazySingleton(() => ObtenerUsuarioUseCase(sl()));
   sl.registerLazySingleton(() => ObservarUsuariosUseCase(sl()));
   sl.registerLazySingleton(() => ActualizarRolUseCase(sl()));

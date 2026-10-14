@@ -3,6 +3,20 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ===============================================================
+    // Modelos asumidos
+    // ===============================================================
+    // usuarios/{uid}: nombre, apellido, correo, matricula y telefono
+    // (strings requeridos y limitados); rol (admin/alumno/staff) y activo
+    // (booleanos requeridos). Los usuarios no pueden asignarse privilegios.
+    // roles/{id}, permisos/{id}: nombre y descripcion (strings requeridos).
+    // edificios/{id}: nombre (string); categorias/{id}: nombre e icono
+    // (strings), IDs usados como referencias y validados al escribir espacios.
+    // espacios/{id}: nombre, descripcion, edificioId y categoriaId
+    // (strings requeridos); imagenUrl (string HTTPS opcional).
+    // IDs de edificio/categoría apuntan a documentos existentes en sus
+    // catálogos. Las colecciones no declaradas abajo quedan denegadas.
+
     function estaAutenticado() {
       return request.auth != null;
     }
@@ -16,21 +30,117 @@ service cloud.firestore {
         get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.rol == 'admin';
     }
 
+    // El UID se representa en la ruta del documento, no en sus campos.
+    function uidUnchanged(uid) {
+      return estaAutenticado() && (request.auth.uid == uid || esAdmin());
+    }
+
+    function uidNotModified(uid) {
+      return estaAutenticado() &&
+        (request.auth.uid == uid || esAdmin()) &&
+        !('uid' in request.resource.data) &&
+        !('uid' in resource.data);
+    }
+
+    function cadenasValidasUsuario(datos) {
+      return datos.nombre is string &&
+        datos.nombre.size() > 0 && datos.nombre.size() <= 80 &&
+        datos.apellido is string &&
+        datos.apellido.size() > 0 && datos.apellido.size() <= 80 &&
+        datos.correo is string &&
+        datos.correo.size() > 0 && datos.correo.size() <= 254 &&
+        datos.correo.matches('^[^@ ]+@[^@ ]+\\.[^@ ]+$') &&
+        datos.matricula is string && datos.matricula.size() <= 32 &&
+        datos.telefono is string && datos.telefono.size() <= 32;
+    }
+
+    function usuarioValido(datos) {
+      return datos.keys().hasOnly([
+          'nombre', 'apellido', 'correo', 'matricula', 'telefono', 'rol',
+          'activo'
+        ]) &&
+        datos.keys().hasAll([
+          'nombre', 'apellido', 'correo', 'matricula', 'telefono', 'rol',
+          'activo'
+        ]) &&
+        cadenasValidasUsuario(datos) &&
+        datos.rol in ['admin', 'alumno', 'staff'] &&
+        datos.activo is bool;
+    }
+
+    function catalogoValido(datos) {
+      return datos.keys().hasOnly(['nombre', 'descripcion']) &&
+        datos.keys().hasAll(['nombre', 'descripcion']) &&
+        datos.nombre is string && datos.nombre.size() > 0 &&
+        datos.nombre.size() <= 100 &&
+        datos.descripcion is string && datos.descripcion.size() <= 500;
+    }
+
+    function espacioValido(datos) {
+      return datos.keys().hasOnly([
+          'nombre', 'descripcion', 'edificioId', 'categoriaId', 'imagenUrl'
+        ]) &&
+        datos.keys().hasAll([
+          'nombre', 'descripcion', 'edificioId', 'categoriaId'
+        ]) &&
+        datos.nombre is string && datos.nombre.size() > 0 &&
+        datos.nombre.size() <= 120 &&
+        datos.descripcion is string && datos.descripcion.size() <= 2000 &&
+        datos.edificioId is string && datos.edificioId.size() > 0 &&
+        datos.edificioId.size() <= 80 &&
+        datos.edificioId.matches('^[^/]+$') &&
+        datos.categoriaId is string && datos.categoriaId.size() > 0 &&
+        datos.categoriaId.size() <= 80 &&
+        datos.categoriaId.matches('^[^/]+$') &&
+        exists(/databases/$(database)/documents/edificios/$(datos.edificioId)) &&
+        exists(/databases/$(database)/documents/categorias/$(datos.categoriaId)) &&
+        (!('imagenUrl' in datos) ||
+          (datos.imagenUrl is string &&
+            datos.imagenUrl.size() > 0 &&
+            datos.imagenUrl.size() <= 2048 &&
+            datos.imagenUrl.matches('^https://.*')));
+    }
+
     match /usuarios/{uid} {
       allow read: if esDueno(uid) || esAdmin();
-      allow create: if esDueno(uid);
-      allow update: if esDueno(uid) || esAdmin();
+      allow create: if uidUnchanged(uid) &&
+        usuarioValido(request.resource.data) &&
+        ((esDueno(uid) &&
+            request.resource.data.rol == 'alumno' &&
+            request.resource.data.activo == true) ||
+          esAdmin());
+      allow update: if uidNotModified(uid) &&
+        usuarioValido(request.resource.data) &&
+        (esAdmin() ||
+          (esDueno(uid) &&
+            request.resource.data.rol == resource.data.rol &&
+            request.resource.data.activo == resource.data.activo &&
+            request.resource.data.diff(resource.data).affectedKeys()
+                .hasOnly(['nombre', 'apellido', 'matricula', 'telefono'])));
       allow delete: if esAdmin();
     }
 
     match /roles/{id} {
       allow read: if estaAutenticado();
-      allow write: if esAdmin();
+      allow create, update: if esAdmin() && catalogoValido(request.resource.data);
+      allow delete: if esAdmin();
     }
 
     match /permisos/{id} {
       allow read: if estaAutenticado();
-      allow write: if esAdmin();
+      allow create, update: if esAdmin() && catalogoValido(request.resource.data);
+      allow delete: if esAdmin();
+    }
+
+    match /espacios/{id} {
+      allow read: if estaAutenticado();
+      allow create, update: if esAdmin() && espacioValido(request.resource.data);
+      allow delete: if esAdmin();
+    }
+
+    // Denegación por defecto para documentos que no están contemplados.
+    match /{documento=**} {
+      allow read, write: if false;
     }
   }
 }

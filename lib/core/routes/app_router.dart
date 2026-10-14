@@ -6,6 +6,7 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/registro_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/espacios/presentation/screens/lista_espacios_screen.dart';
 import '../../features/user/presentation/screens/detalle_usuario_screen.dart';
 import '../../features/user/presentation/screens/lista_usuarios_screen.dart';
 import '../../features/user/presentation/screens/perfil_screen.dart';
@@ -24,6 +25,7 @@ class AppRouter {
         AppRoutes.login: (_) => const LoginScreen(),
         AppRoutes.registro: (_) => const RegistroScreen(),
         AppRoutes.home: (_) => const HomeScreen(),
+        AppRoutes.espacios: (_) => const ListaEspaciosScreen(),
         AppRoutes.perfil: (_) => const PerfilScreen(),
         AppRoutes.cambiarPassword: (_) => const CambiarPasswordScreen(),
         AppRoutes.usuarios: (context) {

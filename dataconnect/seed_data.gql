@@ -1,0 +1,93 @@
+mutation SeedData @transaction {
+  user_insertMany(data: [
+    {
+      id: "77777777-7777-7777-7777-777777777701",
+      email: "alice@example.com",
+      role: "student"
+    },
+    {
+      id: "77777777-7777-7777-7777-777777777702",
+      email: "bob@example.com",
+      role: "student"
+    },
+    {
+      id: "77777777-7777-7777-7777-777777777703",
+      email: "charlie@example.com",
+      role: "admin"
+    }
+  ])
+  building_insertMany(data: [
+    {
+      id: "88888888-8888-8888-8888-888888888801",
+      name: "Science Hall",
+      latitude: 34.05,
+      longitude: -118.25
+    },
+    {
+      id: "88888888-8888-8888-8888-888888888802",
+      name: "Library",
+      latitude: 34.06,
+      longitude: -118.26
+    },
+    {
+      id: "88888888-8888-8888-8888-888888888803",
+      name: "Student Union",
+      latitude: 34.07,
+      longitude: -118.27
+    }
+  ])
+  event_insertMany(data: [
+    {
+      title: "Science Fair",
+      date: "2023-12-01T10:00:00Z",
+      locationId: "88888888-8888-8888-8888-888888888801"
+    },
+    {
+      title: "Book Club Meeting",
+      date: "2023-12-05T14:00:00Z",
+      locationId: "88888888-8888-8888-8888-888888888802"
+    },
+    {
+      title: "Movie Night",
+      date: "2023-12-10T19:00:00Z",
+      locationId: "88888888-8888-8888-8888-888888888803"
+    }
+  ])
+  chatHistory_insertMany(data: [
+    {
+      userId: "77777777-7777-7777-7777-777777777701",
+      prompt: "How do I register?",
+      response: "Visit the registrar portal.",
+      timestamp: "2023-11-01T09:00:00Z"
+    },
+    {
+      userId: "77777777-7777-7777-7777-777777777702",
+      prompt: "Library hours?",
+      response: "Open until 10 PM.",
+      timestamp: "2023-11-01T10:00:00Z"
+    },
+    {
+      userId: "77777777-7777-7777-7777-777777777703",
+      prompt: "Admin contact?",
+      response: "Email admin@university.edu.",
+      timestamp: "2023-11-01T11:00:00Z"
+    }
+  ])
+  procedure_insertMany(data: [
+    {
+      title: "Enrollment",
+      description: "Submit forms by deadline.",
+      deadline: "2023-12-15T23:59:59Z"
+    },
+    {
+      title: "Graduation Application",
+      description: "File intent to graduate.",
+      deadline: "2023-12-20T23:59:59Z"
+    },
+    {
+      title: "Parking Permit",
+      description: "Request via student dashboard.",
+      deadline: "2023-12-25T23:59:59Z"
+    }
+  ])
+}

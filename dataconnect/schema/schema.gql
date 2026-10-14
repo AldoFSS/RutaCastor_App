@@ -1,0 +1,39 @@
+type User @table {
+  email: String!
+  role: String!
+  studentId: String
+  career: String
+  profilePictureUrl: String
+}
+
+type Building @table {
+  name: String!
+  latitude: Float!
+  longitude: Float!
+  description: String
+  imageReference: String
+  category: String
+}
+
+type Procedure @table {
+  title: String!
+  description: String!
+  deadline: Timestamp!
+  requirements: [String]
+  linkUrl: String
+}
+
+type Event @table {
+  title: String!
+  date: Timestamp!
+  location: Building!
+  description: String
+  flyerImageUrl: String
+}
+
+type ChatHistory @table {
+  user: User!
+  prompt: String!
+  response: String!
+  timestamp: Timestamp!
+}

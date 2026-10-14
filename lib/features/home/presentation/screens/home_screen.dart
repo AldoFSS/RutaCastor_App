@@ -18,6 +18,7 @@ class HomeScreen extends StatelessWidget {
 
     final opciones = [
       _MenuOpcion('Mapa del campus', Icons.map_outlined, '/mapa'),
+      _MenuOpcion('Espacios', Icons.meeting_room_outlined, AppRoutes.espacios),
       _MenuOpcion('Trámites', Icons.assignment_turned_in_outlined, '/tramites'),
       _MenuOpcion('Copiloto IA', Icons.smart_toy_outlined, '/copiloto'),
       _MenuOpcion(
@@ -33,7 +34,11 @@ class HomeScreen extends StatelessWidget {
             AppRoutes.usuarios),
     ];
 
-    final rutasNavegables = {AppRoutes.perfil, AppRoutes.usuarios};
+    final rutasNavegables = {
+      AppRoutes.perfil,
+      AppRoutes.usuarios,
+      AppRoutes.espacios,
+    };
 
     return Scaffold(
       appBar: AppBar(title: const Text('RutaCastor')),
