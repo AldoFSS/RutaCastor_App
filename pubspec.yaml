@@ -22,6 +22,7 @@ dependencies:
 
   # Red
   dio: ^5.7.0
+  http: ^1.2.0
 
   # Sesión / almacenamiento
   shared_preferences: ^2.3.2

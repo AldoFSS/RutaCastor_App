@@ -22,6 +22,10 @@ class EspacioMarker extends StatelessWidget {
         return Icons.restaurant;
       case TipoEspacio.areaEstudio:
         return Icons.menu_book;
+      case TipoEspacio.biblioteca:
+        return Icons.local_library;
+      case TipoEspacio.bano:
+        return Icons.wc;
       case TipoEspacio.otro:
         return Icons.place;
     }
