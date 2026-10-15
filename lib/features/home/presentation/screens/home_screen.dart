@@ -17,7 +17,7 @@ class HomeScreen extends StatelessWidget {
         context.watch<AuthCubit>().state.usuario?.rol == TipoRol.admin;
 
     final opciones = [
-      _MenuOpcion('Mapa del campus', Icons.map_outlined, '/mapa'),
+      _MenuOpcion('Mapa del campus', Icons.map_outlined, AppRoutes.mapa),
       _MenuOpcion('Trámites', Icons.assignment_turned_in_outlined, '/tramites'),
       _MenuOpcion('Copiloto IA', Icons.smart_toy_outlined, '/copiloto'),
       _MenuOpcion(
@@ -33,7 +33,11 @@ class HomeScreen extends StatelessWidget {
             AppRoutes.usuarios),
     ];
 
-    final rutasNavegables = {AppRoutes.perfil, AppRoutes.usuarios};
+    final rutasNavegables = {
+      AppRoutes.mapa,
+      AppRoutes.perfil,
+      AppRoutes.usuarios,
+    };
 
     return Scaffold(
       appBar: AppBar(title: const Text('RutaCastor')),
@@ -57,8 +61,6 @@ class HomeScreen extends StatelessWidget {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(16),
                       onTap: () {
-                        // Módulos de mapa, trámites, copiloto y eventos
-                        // se conectan en fases posteriores del sprint.
                         if (rutasNavegables.contains(o.ruta)) {
                           Navigator.of(context).pushNamed(o.ruta);
                         }

@@ -11,10 +11,10 @@ class BusquedaScreen extends StatefulWidget {
 
 class _BusquedaScreenState extends State<BusquedaScreen> {
   final CategoriaService _categoriaService = CategoriaService();
-  
+
   List<Categoria> _categorias = [];
   bool _isLoadingCategorias = true;
-  
+
   String? _categoriaSeleccionadaId;
   String _filtroTexto = '';
   final TextEditingController _searchController = TextEditingController();
@@ -53,8 +53,8 @@ class _BusquedaScreenState extends State<BusquedaScreen> {
     final lugaresFiltrados = _todosLosLugares.where((lugar) {
       final coincideTexto = lugar['nombre'].toLowerCase().contains(_filtroTexto.toLowerCase()) ||
                             lugar['descripcion'].toLowerCase().contains(_filtroTexto.toLowerCase());
-      
-      final coincideCategoria = _categoriaSeleccionadaId == null || 
+
+      final coincideCategoria = _categoriaSeleccionadaId == null ||
                                 lugar['categoriaId'] == _categoriaSeleccionadaId;
 
       return coincideTexto && coincideCategoria;
