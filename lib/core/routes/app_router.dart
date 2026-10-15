@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../di/injection_container.dart';
 import '../../features/auth/presentation/screens/cambiar_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/registro_screen.dart';
@@ -8,6 +9,9 @@ import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/user/presentation/screens/detalle_usuario_screen.dart';
 import '../../features/user/presentation/screens/lista_usuarios_screen.dart';
+import '../../features/map/presentation/screens/map_screen.dart';
+import '../../features/map/presentation/cubit/edificios_cubit.dart';
+import '../../features/map/presentation/cubit/map_cubit.dart';
 import '../../features/user/presentation/screens/perfil_screen.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../features/user/domain/entities/rol.dart';
@@ -21,6 +25,15 @@ class AppRouter {
 
   static Map<String, WidgetBuilder> get routes => {
         AppRoutes.splash: (_) => const SplashScreen(),
+        AppRoutes.mapa: (_) => MultiBlocProvider(
+              providers: [
+                BlocProvider<MapCubit>(create: (_) => sl<MapCubit>()),
+                BlocProvider<EdificiosCubit>(
+                  create: (_) => sl<EdificiosCubit>(),
+                ),
+              ],
+              child: const MapScreen(),
+            ),
         AppRoutes.login: (_) => const LoginScreen(),
         AppRoutes.registro: (_) => const RegistroScreen(),
         AppRoutes.home: (_) => const HomeScreen(),

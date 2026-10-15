@@ -28,6 +28,12 @@ import '../../features/user/presentation/cubit/detalle_usuario_cubit.dart';
 import '../../features/user/presentation/cubit/lista_usuarios_cubit.dart';
 import '../../features/user/presentation/cubit/perfil_cubit.dart';
 
+import '../../features/map/data/datasources/map_remote_data_source.dart';
+import '../../features/map/data/repositories/map_repository_impl.dart';
+import '../../features/map/domain/repositories/map_repository.dart';
+import '../../features/map/presentation/cubit/edificios_cubit.dart';
+import '../../features/map/presentation/cubit/map_cubit.dart';
+
 /// Contenedor de inyección de dependencias (patrón Service Locator con
 /// get_it).
 ///
@@ -36,6 +42,7 @@ import '../../features/user/presentation/cubit/perfil_cubit.dart';
 /// a Firebase, almacenamiento local seguro, repositorios, el AuthCubit
 /// que guarda el estado global de sesión); y como **factory** los Cubits
 /// de pantalla, que se crean nuevos cada vez que la pantalla los pide.
+
 final sl = GetIt.instance;
 
 Future<void> initInjectionContainer() async {
@@ -109,4 +116,13 @@ Future<void> initInjectionContainer() async {
       usuarioDemo: usuarioDemo,
     ),
   );
+  // ---- Feature: Mapa ----
+  sl.registerLazySingleton<MapRemoteDataSource>(
+    () => MapRemoteDataSourceImpl(db: sl()),
+  );
+  sl.registerLazySingleton<MapRepository>(
+    () => MapRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerFactory(() => MapCubit(repository: sl()));
+  sl.registerFactory(() => EdificiosCubit());
 }
